@@ -12,9 +12,9 @@ int main()
 {
 	int temp;
 	//---------INITIAL INPUT-----------
-	printf("     Enter number of states ::::: ");
+	printf("Enter number of states ::::: ");
 	scanf("%d",&numsta);
-	printf("     Enter number of symbols :::::");
+	printf("Enter number of symbols :::::");
 	scanf("%d",&numsym);
 	//--------TAKING EPSILON CASE--------
 	numsym += 1;
@@ -42,12 +42,12 @@ int main()
 				if(j == 0)
 				{
 					//TAKING CASE FOR EPSILON TRANSITIONS
-					printf("     Epsilon transition for Q%d -> Q%d ::::: ",i,k);
+					printf("Epsilon transition for Q%d -> Q%d ::::: ",i,k);
 					scanf("%d",&temp);
 					arr[i][j][k] = temp;
 				}
 				else{
-					printf("     Symbol %d transition for Q%d -> Q%d ::::: ",j,i,k);
+					printf("Symbol %d transition for Q%d -> Q%d ::::: ",j,i,k);
 					scanf("%d",&temp);
 					arr[i][j][k] = temp;
 				}
@@ -62,7 +62,7 @@ int main()
 		for(j=0;j<numsta;j++)
 			eclose[i][j] = 0;
 	}
-	printf("\n     Which is the starting state ::::: ");
+	printf("\n\nWhich is the starting state ::::: ");
 	scanf("%d",&st);
 	//-----------COMPUTING THE EPSILON CLOSURE OF ORIGINAL STATES
 	for(i=0;i<numsta;i++)
@@ -91,7 +91,7 @@ int main()
 	while(1)
 	{
 		int *sid;//POINTER RECIEVED FROM COMPUTE FUNCTION
-		int cols[3][numsta];//TO STORE THE FINAL RESULT
+		int cols[numsym][numsta];//TO STORE THE FINAL RESULT
 		for(i=0;i<numsta;i++)
 		{
 			cols[0][i] = send[i];
@@ -102,7 +102,7 @@ int main()
 			past[pas][i] = send[i];
 		pas += 1;
 		//------------STORE FINAL RESULT IN COLS----------------
-		for(i=1;i<=2;i++)
+		for(i=1;i<numsym;i++)
 		{
 			for(j=0;j<numsta;j++)
 			{
@@ -111,7 +111,7 @@ int main()
 			}
 		}
 		//=========DISPLAY COLS===========
-		for(i=0;i<=2;i++)
+		for(i=0;i<numsym;i++)
 		{
 			printf("{ ");
 			for(j=0;j<numsta;j++)
@@ -122,10 +122,11 @@ int main()
 			printf("}\t\t");
 		}
 		//----------Check if new element arrived---------
-		int ii,jj,ap[2];
-		ap[0] = 0;
-		ap[1] = 0;
-		for(i=1;i<=2;i++)
+		int ii,jj,apo[numsym - 1];
+		int lark;
+		for(lark = 0 ; lark < (numsym - 1) ; lark++)
+			apo[lark] = 0;
+		for(i=1;i<numsym;i++)
 		{
 				for(ii=0;ii<pas;ii++)
 				{
@@ -136,13 +137,13 @@ int main()
 							flag++;
 					}
 					if(flag == numsta)
-						ap[i-1] = 1;
+						apo[i-1] = 1;
 				}
 		}
-		//-------if AP[I] IS 0 THEN NEW ELEMENT ARRIVED----------
-		for(i = 0; i<=1;i++)
+		//-------if APO[I] IS 0 THEN NEW ELEMENT ARRIVED----------
+		for(i = 0; i< (numsym - 1);i++)
 		{
-			if(ap[i] == 0)
+			if(apo[i] == 0)
 			{
 				for(j=0;j<numsta;j++)
 				{
@@ -176,7 +177,8 @@ int main()
 		if(send[0] == -2)
 			break;
 	}
-	
+	printf("\n");
+	//----------------------------------------------------------------------------------------------------------------------
 }
 
 int* compute(int arr[numsta][numsym][numsta], int eclose[numsta][numsta],int eeclose[numsta])
