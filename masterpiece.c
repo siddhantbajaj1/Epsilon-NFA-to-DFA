@@ -7,7 +7,7 @@ int numsym,numsta;
 int st;
 //---------FUNCTION DECLARATION FOR FINDING NEW STATES----------
 int* compute();
-
+int* silon();
 int main()
 {
 	int temp;
@@ -54,6 +54,22 @@ int main()
 			}
 		}	
 	}
+	/*
+	//---------PRINTING THE 3-D ARRAY--------------------
+	for(i=0;i<numsta;i++)
+	{
+		for(j=0;j<numsym;j++)
+		{
+			for(k=0;k<numsta;k++)
+			{
+				printf("%d",arr[i][j][k]);
+			}
+			printf("\t");
+		}
+		printf("\n");
+	}
+	//-----------------------------------------------------
+	*/
 	//------STORING EPSILON CLOSURE OF ORIGINAL STATES
 	int eclose[numsta][numsta];
 	//-------------------INITIALIZING EPSILON CLOSURE SET----------------
@@ -67,12 +83,25 @@ int main()
 	//-----------COMPUTING THE EPSILON CLOSURE OF ORIGINAL STATES
 	for(i=0;i<numsta;i++)
 	{
-		eclose[i][i] = 1;
-		for(j=0;j<numsta;j++){
+		int *toni;
+		toni = silon(eclose,i,arr);
+		/*for(j=0;j<numsta;j++){
 			if(arr[i][0][j] == 1)
 				eclose[i][j] = 1;
-		}
+		}*/
 	}
+	/*
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	//PRINTING EPSILON CLOSURE OF ORIGINAL STATES
+	for(i=0;i<numsta;i++)
+	{
+		for(j=0;j<numsta;j++)
+			printf("%d",eclose[i][j]);
+		printf("\n");
+	}
+	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	//-------------------------------------------------------------------------------------------------------
+	*/
 	int foot = 0;//NEXT NEW STATE TO BE SENT
 	int past[10][numsta];//STATES TO TRAVEL IN THE FUTURE
 	int future[10][numsta];//STATES ALREADY TRAVELLED
@@ -90,6 +119,8 @@ int main()
 		send[j] = eclose[st][j];
 	while(1)
 	{
+		//for(i=0;i<numsta;i++)
+			//printf("%d",send[i]);
 		int *sid;//POINTER RECIEVED FROM COMPUTE FUNCTION
 		int cols[numsym][numsta];//TO STORE THE FINAL RESULT
 		for(i=0;i<numsta;i++)
@@ -121,6 +152,8 @@ int main()
 			}
 			printf("}\t\t");
 		}
+		//printf("\n");
+
 		//----------Check if new element arrived---------
 		int ii,jj,apo[numsym - 1];
 		int lark;
@@ -174,10 +207,29 @@ int main()
 			send[j] = future[foot][j];
 		}
 		foot += 1;
+		//printf("--------%d%d%d--------",future[foot][0],future[foot][1],future[foot][2]);
 		if(send[0] == -2)
 			break;
 	}
+	/*
 	printf("\n");
+	for(i=0;i<=foot;i++)
+	{
+		for(j=0;j<numsta;j++)
+		{
+			printf("%d",future[i][j]);
+		}
+		printf("\n");
+	}
+	for(i=0;i<=pas;i++)
+	{
+		for(j=0;j<numsta;j++)
+		{
+			printf("%d",past[i][j]);
+		}
+		printf("\n");
+	}*/
+	printf("\n\n");
 	//----------------------------------------------------------------------------------------------------------------------
 }
 
@@ -209,6 +261,11 @@ int* compute(int arr[numsta][numsym][numsta], int eclose[numsta][numsta],int eec
 					}
 				}
 			}
+			/*
+			for(i=0;i<numsta;i++)
+				printf("%d",temp[i]);
+			*/
+			//============================
 			//-------CROSS CHECK TEMPORARY SOLUTION WITH THE EPSILON CLOSURE OF ORIGINAL STATES AND APPEND TO FINAL SOLUTION--------------
 			printf("\n");
 			symbol -= 1;
@@ -218,5 +275,35 @@ int* compute(int arr[numsta][numsym][numsta], int eclose[numsta][numsta],int eec
 						if(temp1[symbol][i] != 1) 
 							temp1[symbol][i] = eclose[j][i];
 		}
+		/*
+		symbol = numsym - 1;
+		for(j=0;j<symbol;j++){
+			for(i=0;i<numsta;i++)
+				printf("%d",temp1[j][i]);
+			printf("\n");
+		}*/
 		return temp1;	
+}
+
+int* silon(int eclose[numsta][numsta], int i, int arr[numsta][numsym][numsta])
+{
+	//printf("cazz");
+	int j;
+	int *toni;
+	eclose[i][i] = 1;
+	for(j=0;j<numsta;j++){
+			if (i == j)
+				continue;
+			if(arr[i][0][j] == 1){
+				eclose[i][j] = 1;
+				toni = silon(eclose,j,arr);
+				int temp;
+				for(temp = 0 ; temp < numsta ; temp++)
+				{
+					if(toni[temp] == 1)
+						eclose[i][temp] = 1;
+				}
+			}
+	}
+	return eclose[i];
 }
